@@ -97,28 +97,31 @@ class MasterMindGame
       @game_state = "finished"
     end
     
-
   end
 
   def get_feedback(guess, code = @secret_code)
     exact = 0
     in_code = 0
-    temp_guess = guess.dup
     @temp_code = code.dup
-    
-    guess.each_with_index do |char, idx|
-      #count matches
+    temp_guess = guess.dup
+
+    temp_guess.each_with_index do |char, idx|
+      #count exact matches
       if char == @temp_code[idx]
         exact += 1
-        @temp_code[idx] = "already used"
-      elsif @temp_code.include?(char)
+        temp_guess[idx] = "used"
+        @temp_code[idx] = "exact"
+      end
+    end
+
+    temp_guess.each_with_index do |char, idx|
+      #count all matches
+      if @temp_code.include?(char)
         in_code += 1
-        @temp_code[@temp_code.index(char)] = "already used"
-      else
-        nil
       end
     end
     return [exact, in_code]
+
   end
   
   def get_computer_guess
@@ -141,7 +144,7 @@ end
 
 
 #gameflow
-game = MasterMindGame.new(12,1,3)
+game = MasterMindGame.new(12,2,4)
 game.print_gameboard
 while game.game_state == "started"
   game.play_guess
