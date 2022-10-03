@@ -96,7 +96,7 @@ class MasterMindGame
     if feedback[0] == @size
       @game_state = "finished"
     end
-    
+
   end
 
   def get_feedback(guess, code = @secret_code)
@@ -144,7 +144,7 @@ end
 
 
 #gameflow
-game = MasterMindGame.new(12,2,4)
+game = MasterMindGame.new(12,1,4)
 game.print_gameboard
 while game.game_state == "started"
   game.play_guess
