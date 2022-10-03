@@ -61,7 +61,7 @@ class MasterMindGame
     system('clear')
     puts "Code Maker = #{@code_maker}, code Breaker = #{@code_breaker}."
     puts "Game status = #{@game_state}."
-    puts "code Breaker has #{@current_turn} tries left."
+    puts "Code Breaker has #{@current_turn} tries left."
     puts ""
     puts "- c o d e -"
 
@@ -70,9 +70,10 @@ class MasterMindGame
     else
       puts "#{color_print(@secret_code)}"
     end
-
+    puts "------------"
     puts([*1..6, "exact", "in"].join(" "))
     @history.each {|line| puts color_print(line)}
+    puts "----------------"
   end
 
   def play_guess
@@ -110,7 +111,7 @@ class MasterMindGame
 end
 
 #gameflow
-game = MasterMindGame.new(4,2)
+game = MasterMindGame.new(12,4)
 game.print_gameboard
 while game.game_state == "started"
   game.play_guess
