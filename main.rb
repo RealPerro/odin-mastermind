@@ -19,10 +19,12 @@ class MasterMindGame
     @current_turn = n_turns
     @code_maker = @@modes[game_mode][:code_maker]
     @code_breaker = @@modes[game_mode][:code_breaker]
-    @secret_code = get_secret_code()
     @game_state = 'started'
     @history = Array.new(n_turns) {Array.new(8)}
     @size = size
+    @all_possible_codes = @@colors.repeated_permutation(@size)
+    @secret_code = get_secret_code()
+    @temp_code = []
   end
 
   def get_secret_code
@@ -67,52 +69,78 @@ class MasterMindGame
     puts "c o d e"
 
     if @game_state == 'started'
-      puts "* * * *"
+      puts "* " * @size
     else
       puts "#{color_print(@secret_code)}"
     end
-    puts "------------"
+    puts "--------"
     puts([*1..@size, "exact", "in"].join(" "))
+    puts "--------"
     @history.each {|line| puts color_print(line)}
-    puts "----------------"
+    puts "--------"
   end
 
   def play_guess
-    puts "type your guess"
-    guess = gets[0, @size].split("")
+    if @code_breaker == 'human' 
+      puts "type your guess"
+      guess = gets[0, @size].split("")
+    elsif @code_breaker == 'computer'
+      pause = gets
+      guess = get_computer_guess[0, @size]
+   end
+    
     feedback = get_feedback(guess)
     @history[@current_turn] = guess.push(feedback)
     @current_turn -= 1
     if feedback[0] == @size
       @game_state = "finished"
     end
+    
+
   end
 
-  def get_feedback(guess)
+  def get_feedback(guess, code = @secret_code)
     exact = 0
     in_code = 0
-    temp_code = @secret_code.dup
+    temp_guess = guess.dup
+    @temp_code = code.dup
+    
     guess.each_with_index do |char, idx|
-      #count exact matches
-      if char == temp_code[idx]
+      #count matches
+      if char == @temp_code[idx]
         exact += 1
-        temp_code[idx] = "already used"
-      end
-    end
-    guess.each_with_index do |char, idx|
-      #count partial matches only after all exact matches have been accounted
-      if temp_code.include?(char)
+        @temp_code[idx] = "already used"
+      elsif @temp_code.include?(char)
         in_code += 1
-        temp_code[temp_code.index(char)] = "already used"
+        @temp_code[@temp_code.index(char)] = "already used"
+      else
+        nil
       end
     end
     return [exact, in_code]
   end
   
+  def get_computer_guess
+    if @current_turn == 12
+      first = @@colors.sample
+      second = @@colors.sample
+      guess = [first, first, second, second]
+      return guess
+    end
+    previous_guess = @history[@current_turn + 1][0,@size]
+    previous_feedback = @history[@current_turn + 1][@size]
+    return current_possible_codes(previous_guess, previous_feedback).sample
+  end
+
+  def current_possible_codes(guess, feedback)
+    current_possible_codes = @all_possible_codes.select {|code| get_feedback(guess, code) == feedback}
+  end
 end
 
+
+
 #gameflow
-game = MasterMindGame.new(12,4,4)
+game = MasterMindGame.new(12,2,3)
 game.print_gameboard
 while game.game_state == "started"
   game.play_guess
