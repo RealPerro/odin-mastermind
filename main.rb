@@ -25,6 +25,7 @@ class MasterMindGame
     @all_possible_codes = @@colors.repeated_permutation(@size)
     @secret_code = get_secret_code()
     @temp_code = []
+    @current_possible_codes = @all_possible_codes.dup
   end
 
   def get_secret_code
@@ -133,14 +134,14 @@ class MasterMindGame
   end
 
   def current_possible_codes(guess, feedback)
-    current_possible_codes = @all_possible_codes.select {|code| get_feedback(guess, code) == feedback}
+    @current_possible_codes = @current_possible_codes.select {|code| get_feedback(guess, code) == feedback}
   end
 end
 
 
 
 #gameflow
-game = MasterMindGame.new(12,2,3)
+game = MasterMindGame.new(12,1,3)
 game.print_gameboard
 while game.game_state == "started"
   game.play_guess
