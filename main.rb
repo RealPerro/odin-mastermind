@@ -15,23 +15,24 @@ class MasterMindGame
     4 => {:code_maker => "computer", :code_breaker => "human"},
   }
 
-  def initialize(n_turns = 12, game_mode = 4)
+  def initialize(n_turns = 12, game_mode = 4, size = 4)
     @current_turn = n_turns
     @code_maker = @@modes[game_mode][:code_maker]
     @code_breaker = @@modes[game_mode][:code_breaker]
     @secret_code = get_secret_code()
     @game_state = 'started'
     @history = Array.new(n_turns) {Array.new(8)}
+    @size = size
   end
 
   def get_secret_code
     if @code_maker == 'human'
       valid = false
       while valid == false
-        puts "Please enter your 6-color code"
+        puts "Please enter your #{@size}-color code"
         puts color_print(@@colors)
         puts "are accepted."
-        code = gets[0,6].split("")
+        code = gets[0,@size].split("")
         if code.all? {|c| @@colors.include?(c)}
           puts "Yep, it worked"
           valid = true
@@ -43,7 +44,7 @@ class MasterMindGame
       #color_print(code)
       return code
    else
-      code = 6.times.map {@@colors.sample}
+      code = 4.times.map {@@colors.sample}
       #color_print(code)
       return code  
    end
@@ -63,26 +64,26 @@ class MasterMindGame
     puts "Game status = #{@game_state}."
     puts "Code Breaker has #{@current_turn} tries left."
     puts ""
-    puts "- c o d e -"
+    puts "c o d e"
 
     if @game_state == 'started'
-      puts "* * * * * *"
+      puts "* * * *"
     else
       puts "#{color_print(@secret_code)}"
     end
     puts "------------"
-    puts([*1..6, "exact", "in"].join(" "))
+    puts([*1..@size, "exact", "in"].join(" "))
     @history.each {|line| puts color_print(line)}
     puts "----------------"
   end
 
   def play_guess
     puts "type your guess"
-    guess = gets[0,6].split("")
+    guess = gets[0, @size].split("")
     feedback = get_feedback(guess)
     @history[@current_turn] = guess.push(feedback)
     @current_turn -= 1
-    if feedback[0] == 6
+    if feedback[0] == @size
       @game_state = "finished"
     end
   end
@@ -111,7 +112,7 @@ class MasterMindGame
 end
 
 #gameflow
-game = MasterMindGame.new(12,4)
+game = MasterMindGame.new(12,4,4)
 game.print_gameboard
 while game.game_state == "started"
   game.play_guess
