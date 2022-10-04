@@ -5,7 +5,7 @@ require 'colorize'
 class MasterMindGame
   attr_accessor :game_state, :current_turn
 
-  @@ref_colors = [:red, :green, :blue, :yellow, :white, :cyan]
+  @@ref_colors = %i[red green blue yellow white cyan]
   @@colors = %w[r g b y w c]
 
   @@modes = {
@@ -62,7 +62,8 @@ class MasterMindGame
     puts "Code Maker = #{@code_maker}, code Breaker = #{@code_breaker}."
     puts "Game status = #{@game_state}."
     puts "Code Breaker has #{@current_turn} tries left."
-    puts ""
+    puts "Available colors: #{color_print(@@colors)}."
+    puts '--------'
     puts "c o d e"
 
     if @game_state == 'started'
@@ -133,7 +134,14 @@ class MasterMindGame
 end
 
 # gameflow
-game = MasterMindGame.new(12,1,4)
+puts 'Welcome to Ruby Mastermind'
+puts 'Please choose game mode:'
+puts '1 {:code_maker => "human", :code_breaker => "computer"},
+2 {:code_maker => "human", :code_breaker => "human"},
+3 {:code_maker => "computer", :code_breaker => "computer"},
+4 {:code_maker => "computer", :code_breaker => "human"},'
+mode_selection = gets.to_i
+game = MasterMindGame.new(12, mode_selection, 4)
 game.print_gameboard
 while game.game_state == "started"
   game.play_guess
