@@ -1,12 +1,12 @@
-#MasterMind Game for Odin Project Course
-require 'pry-byebug'#binding.pry
+# MasterMind Game for Odin Project Course
+require 'pry-byebug' # binding.pry
 require 'colorize'
 
 class MasterMindGame
-
   attr_accessor :game_state, :current_turn
+
   @@ref_colors = [:red, :green, :blue, :yellow, :white, :cyan]
-  @@colors = ["r", "g", "b", "y", "w", "c"]
+  @@colors = %w[r g b y w c]
 
   @@modes = {
     1 => {:code_maker => "human", :code_breaker => "computer"},
@@ -34,31 +34,27 @@ class MasterMindGame
       while valid == false
         puts "Please enter your #{@size}-color code"
         puts color_print(@@colors)
-        puts "are accepted."
-        code = gets[0,@size].split("")
-        if code.all? {|c| @@colors.include?(c)}
-          puts "Yep, it worked"
+        puts 'are accepted.'
+        code = gets[0,@size].split('')
+        if code.all? { |c| @@colors.include?(c) }
+          puts 'Yep, it worked'
           valid = true
         else
-          puts "Please enter valid colors"
+          puts 'Please enter valid colors'
           valid = false
         end
       end
-      #color_print(code)
-      return code
-   else
-      code = 4.times.map {@@colors.sample}
-      #color_print(code)
-      return code  
-   end
+    else
+      code = 4.times.map { @@colors.sample }
+    end
+    code
   end
 
   def color_print(array)
     color_showcase = []
-    array.each {|color| 
-      color_showcase.push(@@colors.include?(color) ? color.colorize(@@ref_colors[@@colors.index(color)]) : color)}
-      #binding.pry
-      return color_showcase.join(" ")
+    array.each { |color|
+      color_showcase.push(@@colors.include?(color) ? color.colorize(@@ref_colors[@@colors.index(color)]) : color) }
+    color_showcase.join(" ")
   end
 
   def print_gameboard
@@ -70,15 +66,15 @@ class MasterMindGame
     puts "c o d e"
 
     if @game_state == 'started'
-      puts "* " * @size
+      puts '* ' * @size
     else
       puts "#{color_print(@secret_code)}"
     end
+    puts '--------'
+    puts([*1..@size, 'exact', 'in'].join(' '))
     puts "--------"
-    puts([*1..@size, "exact", "in"].join(" "))
-    puts "--------"
-    @history.each {|line| puts color_print(line)}
-    puts "--------"
+    @history.each { |line| puts color_print(line) }
+    puts '--------'
   end
 
   def play_guess
@@ -86,17 +82,13 @@ class MasterMindGame
       puts "type your guess"
       guess = gets[0, @size].split("")
     elsif @code_breaker == 'computer'
-      pause = gets
+      gets
       guess = get_computer_guess[0, @size]
-   end
-    
+    end
     feedback = get_feedback(guess)
     @history[@current_turn] = guess.push(feedback)
     @current_turn -= 1
-    if feedback[0] == @size
-      @game_state = "finished"
-    end
-
+    @game_state = 'finished' if (feedback[0] == @size)
   end
 
   def get_feedback(guess, code = @secret_code)
@@ -106,7 +98,7 @@ class MasterMindGame
     temp_guess = guess.dup
 
     temp_guess.each_with_index do |char, idx|
-      #count exact matches
+      # count exact matches
       if char == @temp_code[idx]
         exact += 1
         temp_guess[idx] = "used"
@@ -114,14 +106,13 @@ class MasterMindGame
       end
     end
 
-    temp_guess.each_with_index do |char, idx|
-      #count all matches
+    temp_guess.each do |char|
+      # count all matches
       if @temp_code.include?(char)
         in_code += 1
       end
     end
-    return [exact, in_code]
-
+    [exact, in_code]
   end
   
   def get_computer_guess
@@ -133,7 +124,7 @@ class MasterMindGame
     end
     previous_guess = @history[@current_turn + 1][0,@size]
     previous_feedback = @history[@current_turn + 1][@size]
-    return current_possible_codes(previous_guess, previous_feedback).sample
+    current_possible_codes(previous_guess, previous_feedback).sample
   end
 
   def current_possible_codes(guess, feedback)
@@ -141,9 +132,7 @@ class MasterMindGame
   end
 end
 
-
-
-#gameflow
+# gameflow
 game = MasterMindGame.new(12,1,4)
 game.print_gameboard
 while game.game_state == "started"
@@ -154,4 +143,4 @@ while game.game_state == "started"
   end
 end
 game.print_gameboard
-puts "game finished*********"
+puts 'game finished*********'
